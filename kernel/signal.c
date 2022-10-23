@@ -51,6 +51,10 @@
 #include <linux/rekernel.h>
 #endif
 
+#ifdef CONFIG_MILLET
+#include <linux/millet.h>
+#endif
+
 #define CREATE_TRACE_POINTS
 #include <trace/events/signal.h>
 
@@ -1279,6 +1283,20 @@ int do_send_sig_info(int sig, struct siginfo *info, struct task_struct *p,
 			char binder_kmsg[PACKET_SIZE];
 		snprintf(binder_kmsg, sizeof(binder_kmsg), "type=Signal,signal=%d,killer_pid=%d,killer=%d,dst_pid=%d,dst=%d;", sig, task_tgid_nr(p), task_uid(p).val, task_tgid_nr(current), task_uid(current).val);
 		send_netlink_message(binder_kmsg, strlen(binder_kmsg));
+	}
+#endif
+#ifdef CONFIG_MILLET
+	struct millet_data data;
+
+	if (sig == SIGKILL
+		|| sig == SIGTERM
+		|| sig == SIGABRT
+		|| sig == SIGQUIT) {
+
+		data.mod.k_priv.sig.caller_task = current;
+		data.mod.k_priv.sig.killed_task = p;
+		data.mod.k_priv.sig.reason = KILLED_BY_PRO;
+		millet_sendmsg(SIG_TYPE, p, &data);
 	}
 #endif
 
@@ -4253,6 +4271,42 @@ __weak const char *arch_vma_name(struct vm_area_struct *vma)
 	return NULL;
 }
 
+#ifdef CONFIG_MILLET
+int last_report_task;
+
+static int signals_sendmsg(struct task_struct *tsk,
+		struct millet_data *data, struct millet_sock *sk)
+{
+	int ret = 0;
+
+	if (!sk || !data || !tsk) {
+		pr_err("%s input invalid\n", __FUNCTION__);
+		return RET_ERR;
+	}
+
+	data->mod.k_priv.sig.killed_pid = task_tgid_nr(tsk);
+	data->uid = task_uid(tsk).val;
+	data->msg_type = MSG_TO_USER;
+	data->owner = SIG_TYPE;
+
+	if (frozen_task_group(tsk)
+		&& (data->mod.k_priv.sig.killed_pid != *(int *)sk->mod[SIG_TYPE].priv)) {
+		*(int *)sk->mod[SIG_TYPE].priv = data->mod.k_priv.sig.killed_pid;
+		ret = millet_sendto_user(tsk, data, sk);
+	}
+
+	return ret;
+}
+
+static void signas_init_millet(struct millet_sock *sk)
+{
+	if (sk) {
+		sk->mod[SIG_TYPE].monitor = SIG_TYPE;
+		sk->mod[SIG_TYPE].priv = (void *)&last_report_task;
+	}
+}
+#endif
+
 void __init signals_init(void)
 {
 	/* If this check fails, the __ARCH_SI_PREAMBLE_SIZE value is wrong! */
@@ -4261,6 +4315,10 @@ void __init signals_init(void)
 	BUILD_BUG_ON(sizeof(struct siginfo) != SI_MAX_SIZE);
 
 	sigqueue_cachep = KMEM_CACHE(sigqueue, SLAB_PANIC);
+#ifdef CONFIG_MILLET
+	register_millet_hook(SIG_TYPE, NULL,
+		signals_sendmsg, signas_init_millet);
+#endif
 }
 
 #ifdef CONFIG_KGDB_KDB
