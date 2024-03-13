@@ -476,7 +476,7 @@ static void amba_deferred_retry_func(struct work_struct *dummy)
 	}
 
 	if (!list_empty(&deferred_devices))
-		schedule_delayed_work(&deferred_retry_work,
+		queue_delayed_work(system_power_efficient_wq,&deferred_retry_work,
 				      DEFERRED_DEVICE_TIMEOUT);
 
 	mutex_unlock(&deferred_devices_lock);
@@ -509,7 +509,7 @@ int amba_device_add(struct amba_device *dev, struct resource *parent)
 		mutex_lock(&deferred_devices_lock);
 
 		if (list_empty(&deferred_devices))
-			schedule_delayed_work(&deferred_retry_work,
+			queue_delayed_work(system_power_efficient_wq,&deferred_retry_work,
 					      DEFERRED_DEVICE_TIMEOUT);
 		list_add_tail(&ddev->node, &deferred_devices);
 

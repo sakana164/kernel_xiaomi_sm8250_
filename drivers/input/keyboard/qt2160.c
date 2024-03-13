@@ -235,7 +235,7 @@ static irqreturn_t qt2160_irq(int irq, void *_qt2160)
 static void qt2160_schedule_read(struct qt2160_data *qt2160)
 {
 	spin_lock_irq(&qt2160->lock);
-	schedule_delayed_work(&qt2160->dwork, QT2160_CYCLE_INTERVAL);
+	queue_delayed_work(system_power_efficient_wq,&qt2160->dwork, QT2160_CYCLE_INTERVAL);
 	spin_unlock_irq(&qt2160->lock);
 }
 

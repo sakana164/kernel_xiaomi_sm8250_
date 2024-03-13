@@ -1016,7 +1016,7 @@ static int rt298_probe(struct snd_soc_component *component)
 
 		INIT_DELAYED_WORK(&rt298->jack_detect_work,
 					rt298_jack_detect_work);
-		schedule_delayed_work(&rt298->jack_detect_work,
+		queue_delayed_work(system_power_efficient_wq,&rt298->jack_detect_work,
 					msecs_to_jiffies(1250));
 	}
 

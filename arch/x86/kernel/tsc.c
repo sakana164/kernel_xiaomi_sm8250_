@@ -1289,7 +1289,7 @@ static void tsc_refine_calibration_work(struct work_struct *work)
 		 * if the hpet becomes enabled later.
 		 */
 		hpet = is_hpet_enabled();
-		schedule_delayed_work(&tsc_irqwork, HZ);
+		queue_delayed_work(system_power_efficient_wq,&tsc_irqwork, HZ);
 		tsc_start = tsc_read_refs(&ref_start, hpet);
 		return;
 	}
@@ -1366,7 +1366,7 @@ unreg:
 		return 0;
 	}
 
-	schedule_delayed_work(&tsc_irqwork, 0);
+	queue_delayed_work(system_power_efficient_wq,&tsc_irqwork, 0);
 	return 0;
 }
 /*

@@ -496,7 +496,7 @@ static void lb_stats_refresh(struct work_struct *work)
 	lb_priv = get_lb_priv(team);
 
 	if (!mutex_trylock(&team->lock)) {
-		schedule_delayed_work(&lb_priv_ex->stats.refresh_dw, 0);
+		queue_delayed_work(system_power_efficient_wq,&lb_priv_ex->stats.refresh_dw, 0);
 		return;
 	}
 
@@ -529,7 +529,7 @@ static void lb_stats_refresh(struct work_struct *work)
 	if (changed)
 		team_options_change_check(team);
 
-	schedule_delayed_work(&lb_priv_ex->stats.refresh_dw,
+	queue_delayed_work(system_power_efficient_wq,&lb_priv_ex->stats.refresh_dw,
 			      (lb_priv_ex->stats.refresh_interval * HZ) / 10);
 
 	mutex_unlock(&team->lock);
@@ -555,7 +555,7 @@ static int lb_stats_refresh_interval_set(struct team *team,
 		return 0;
 	lb_priv->ex->stats.refresh_interval = interval;
 	if (interval)
-		schedule_delayed_work(&lb_priv->ex->stats.refresh_dw, 0);
+		queue_delayed_work(system_power_efficient_wq,&lb_priv->ex->stats.refresh_dw, 0);
 	else
 		cancel_delayed_work(&lb_priv->ex->stats.refresh_dw);
 	return 0;

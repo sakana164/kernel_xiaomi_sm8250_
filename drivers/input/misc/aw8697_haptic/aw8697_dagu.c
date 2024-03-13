@@ -837,7 +837,7 @@ static int aw8697_ram_init(struct aw8697 *aw8697)
 	int ram_timer_val = 5000;
 	aw8697->ram_name = aw8697_ram_name;
 	INIT_DELAYED_WORK(&aw8697->ram_work, aw8697_ram_work_routine);
-	//schedule_delayed_work(&aw8697->ram_work,
+	//queue_delayed_work(system_power_efficient_wq,&aw8697->ram_work,
 	//msecs_to_jiffies(ram_timer_val));
 	queue_delayed_work(aw8697->work_queue, &aw8697->ram_work,
 			   msecs_to_jiffies(ram_timer_val));

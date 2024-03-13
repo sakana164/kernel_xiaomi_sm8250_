@@ -200,7 +200,7 @@ static void tm6000_ir_urb_received(struct urb *urb)
 		printk(KERN_INFO "tm6000: IR URB failure: status: %i, length %i\n",
 		       urb->status, urb->actual_length);
 		ir->submit_urb = 1;
-		schedule_delayed_work(&ir->work, msecs_to_jiffies(URB_SUBMIT_DELAY));
+		queue_delayed_work(system_power_efficient_wq,&ir->work, msecs_to_jiffies(URB_SUBMIT_DELAY));
 		return;
 	}
 	buf = urb->transfer_buffer;
@@ -218,7 +218,7 @@ static void tm6000_ir_urb_received(struct urb *urb)
 	 * So, use the scheduler to do it, in a few ms.
 	 */
 	ir->pwled = 2;
-	schedule_delayed_work(&ir->work, msecs_to_jiffies(10));
+	queue_delayed_work(system_power_efficient_wq,&ir->work, msecs_to_jiffies(10));
 }
 
 static void tm6000_ir_handle_key(struct work_struct *work)
@@ -253,7 +253,7 @@ static void tm6000_ir_handle_key(struct work_struct *work)
 	ir->pwled = 0;
 
 	/* Re-schedule polling */
-	schedule_delayed_work(&ir->work, msecs_to_jiffies(ir->polling));
+	queue_delayed_work(system_power_efficient_wq,&ir->work, msecs_to_jiffies(ir->polling));
 }
 
 static void tm6000_ir_int_work(struct work_struct *work)
@@ -274,7 +274,7 @@ static void tm6000_ir_int_work(struct work_struct *work)
 			printk(KERN_ERR "tm6000: Can't submit an IR interrupt. Error %i\n",
 			       rc);
 			/* Retry in 100 ms */
-			schedule_delayed_work(&ir->work, msecs_to_jiffies(URB_SUBMIT_DELAY));
+			queue_delayed_work(system_power_efficient_wq,&ir->work, msecs_to_jiffies(URB_SUBMIT_DELAY));
 			return;
 		}
 		ir->submit_urb = 0;
@@ -284,7 +284,7 @@ static void tm6000_ir_int_work(struct work_struct *work)
 	if (ir->pwled == 2) {
 		tm6000_flash_led(dev, 0);
 		ir->pwled = 0;
-		schedule_delayed_work(&ir->work, msecs_to_jiffies(URB_INT_LED_DELAY));
+		queue_delayed_work(system_power_efficient_wq,&ir->work, msecs_to_jiffies(URB_INT_LED_DELAY));
 	} else if (!ir->pwled) {
 		tm6000_flash_led(dev, 1);
 		ir->pwled = 1;
@@ -297,7 +297,7 @@ static int tm6000_ir_start(struct rc_dev *rc)
 
 	dprintk(2, "%s\n",__func__);
 
-	schedule_delayed_work(&ir->work, 0);
+	queue_delayed_work(system_power_efficient_wq,&ir->work, 0);
 
 	return 0;
 }
@@ -364,7 +364,7 @@ static int __tm6000_ir_int_start(struct rc_dev *rc)
 		dev->int_in.endp->desc.bInterval);
 
 	ir->submit_urb = 1;
-	schedule_delayed_work(&ir->work, msecs_to_jiffies(URB_SUBMIT_DELAY));
+	queue_delayed_work(system_power_efficient_wq,&ir->work, msecs_to_jiffies(URB_SUBMIT_DELAY));
 
 	return 0;
 }

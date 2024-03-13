@@ -255,7 +255,7 @@ static void atusb_work_urbs(struct work_struct *work)
 	usb_anchor_urb(urb, &atusb->idle_urbs);
 	dev_warn_ratelimited(&usb_dev->dev,
 			     "atusb_in: can't allocate/submit URB (%d)\n", ret);
-	schedule_delayed_work(&atusb->work,
+	queue_delayed_work(system_power_efficient_wq,&atusb->work,
 			      msecs_to_jiffies(ATUSB_ALLOC_DELAY_MS) + 1);
 }
 
@@ -341,7 +341,7 @@ static void atusb_in(struct urb *urb)
 
 	usb_anchor_urb(urb, &atusb->idle_urbs);
 	if (!atusb->shutdown)
-		schedule_delayed_work(&atusb->work, 0);
+		queue_delayed_work(system_power_efficient_wq,&atusb->work, 0);
 }
 
 /* ----- URB allocation/deallocation --------------------------------------- */
@@ -461,7 +461,7 @@ static int atusb_start(struct ieee802154_hw *hw)
 	int ret;
 
 	dev_dbg(&usb_dev->dev, "%s\n", __func__);
-	schedule_delayed_work(&atusb->work, 0);
+	queue_delayed_work(system_power_efficient_wq,&atusb->work, 0);
 	atusb_command(atusb, ATUSB_RX_MODE, 1);
 	ret = atusb_get_and_clear_error(atusb);
 	if (ret < 0)

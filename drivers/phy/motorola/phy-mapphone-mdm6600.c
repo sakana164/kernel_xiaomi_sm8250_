@@ -206,7 +206,7 @@ static irqreturn_t phy_mdm6600_irq_thread(int irq, void *data)
 {
 	struct phy_mdm6600 *ddata = data;
 
-	schedule_delayed_work(&ddata->status_work, msecs_to_jiffies(10));
+	queue_delayed_work(system_power_efficient_wq,&ddata->status_work, msecs_to_jiffies(10));
 
 	return IRQ_HANDLED;
 }
@@ -498,7 +498,7 @@ static void phy_mdm6600_modem_wake(struct work_struct *work)
 	 * the wake GPIO, and sometimes it idles after about some 600 ms
 	 * making writes time out.
 	 */
-	schedule_delayed_work(&ddata->modem_wake_work,
+	queue_delayed_work(system_power_efficient_wq,&ddata->modem_wake_work,
 			      msecs_to_jiffies(PHY_MDM6600_WAKE_KICK_MS));
 }
 
@@ -573,7 +573,7 @@ static int phy_mdm6600_probe(struct platform_device *pdev)
 		goto cleanup;
 	}
 
-	schedule_delayed_work(&ddata->bootup_work, 0);
+	queue_delayed_work(system_power_efficient_wq,&ddata->bootup_work, 0);
 
 	/*
 	 * See phy_mdm6600_device_power_on(). We should be able

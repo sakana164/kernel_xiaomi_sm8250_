@@ -426,7 +426,7 @@ static void mdm_notify(enum esoc_notify notify, struct esoc_clink *esoc)
 			esoc_mdm_log(
 		"ESOC_IMG_XFER_DONE: Begin timeout of %lu ms for modem_status\n",
 			MDM2AP_STATUS_TIMEOUT_MS);
-			schedule_delayed_work(&mdm->mdm2ap_status_check_work,
+			queue_delayed_work(system_power_efficient_wq,&mdm->mdm2ap_status_check_work,
 				msecs_to_jiffies(MDM2AP_STATUS_TIMEOUT_MS));
 		}
 		break;

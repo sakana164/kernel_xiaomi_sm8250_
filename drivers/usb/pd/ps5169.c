@@ -582,7 +582,7 @@ static int ps5169_set_prop(struct power_supply *psy,
 	switch (psp) {
 	case POWER_SUPPLY_PROP_PS_EN:
 		info->pre_ps_enable = val->intval;
-		schedule_delayed_work(&info->ps_en_work, 0);
+		queue_delayed_work(system_power_efficient_wq,&info->ps_en_work, 0);
 		break;
 	case POWER_SUPPLY_PROP_PS_CFG_FLIP:
 		ps5169_config_flip(info, val->intval);

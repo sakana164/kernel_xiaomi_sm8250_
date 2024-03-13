@@ -883,7 +883,7 @@ static void cmd_work_handler(struct work_struct *work)
 	cmd_mode = cmd->mode;
 
 	if (ent->callback)
-		schedule_delayed_work(&ent->cb_timeout_work, cb_timeout);
+		queue_delayed_work(system_power_efficient_wq,&ent->cb_timeout_work, cb_timeout);
 	set_bit(MLX5_CMD_ENT_STATE_PENDING_COMP, &ent->state);
 
 	/* Skip sending command to fw if internal error */

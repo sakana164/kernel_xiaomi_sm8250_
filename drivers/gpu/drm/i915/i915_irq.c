@@ -2948,7 +2948,7 @@ static void __init_wedge(struct wedge_me *w,
 	w->name = name;
 
 	INIT_DELAYED_WORK_ONSTACK(&w->work, wedge_me);
-	schedule_delayed_work(&w->work, timeout);
+	queue_delayed_work(system_power_efficient_wq,&w->work, timeout);
 }
 
 static void __fini_wedge(struct wedge_me *w)

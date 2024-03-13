@@ -911,13 +911,13 @@ static void ax_intr_callback(struct urb *urb)
 	if (axdev->link) {
 		if (!netif_carrier_ok(axdev->netdev)) {
 			set_bit(AX_LINK_CHG, &axdev->flags);
-			schedule_delayed_work(&axdev->schedule, 0);
+			queue_delayed_work(system_power_efficient_wq,&axdev->schedule, 0);
 		}
 	} else {
 		if (netif_carrier_ok(axdev->netdev)) {
 			netif_stop_queue(axdev->netdev);
 			set_bit(AX_LINK_CHG, &axdev->flags);
-			schedule_delayed_work(&axdev->schedule, 0);
+			queue_delayed_work(system_power_efficient_wq,&axdev->schedule, 0);
 		}
 	}
 
@@ -1320,7 +1320,7 @@ static netdev_tx_t ax_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 	if (!list_empty(&axdev->tx_free)) {
 		if (test_bit(AX_SELECTIVE_SUSPEND, &axdev->flags)) {
 			set_bit(AX_SCHEDULE_NAPI, &axdev->flags);
-			schedule_delayed_work(&axdev->schedule, 0);
+			queue_delayed_work(system_power_efficient_wq,&axdev->schedule, 0);
 		} else {
 			usb_mark_last_busy(axdev->udev);
 			napi_schedule(&axdev->napi);
@@ -1484,7 +1484,7 @@ static inline void __ax_work_func(struct ax_device *axdev)
 		goto out;
 
 	if (!mutex_trylock(&axdev->control)) {
-		schedule_delayed_work(&axdev->schedule, 0);
+		queue_delayed_work(system_power_efficient_wq,&axdev->schedule, 0);
 		goto out;
 	}
 

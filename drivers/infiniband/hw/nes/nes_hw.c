@@ -2719,7 +2719,7 @@ void nes_recheck_link_status(struct work_struct *work)
 		}
 	}
 	if (nesdev->link_recheck++ < NES_LINK_RECHECK_MAX)
-		schedule_delayed_work(&nesdev->work, NES_LINK_RECHECK_DELAY);
+		queue_delayed_work(system_power_efficient_wq,&nesdev->work, NES_LINK_RECHECK_DELAY);
 	else
 		nesdev->link_recheck = 0;
 

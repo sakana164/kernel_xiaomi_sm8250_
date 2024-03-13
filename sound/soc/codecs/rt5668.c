@@ -968,7 +968,7 @@ static void rt5668_jd_check_handler(struct work_struct *work)
 				SND_JACK_BTN_0 | SND_JACK_BTN_1 |
 				SND_JACK_BTN_2 | SND_JACK_BTN_3);
 	} else {
-		schedule_delayed_work(&rt5668->jd_check_work, 500);
+		queue_delayed_work(system_power_efficient_wq,&rt5668->jd_check_work, 500);
 	}
 }
 
@@ -1097,7 +1097,7 @@ static void rt5668_jack_detect_handler(struct work_struct *work)
 
 	if (rt5668->jack_type & (SND_JACK_BTN_0 | SND_JACK_BTN_1 |
 		SND_JACK_BTN_2 | SND_JACK_BTN_3))
-		schedule_delayed_work(&rt5668->jd_check_work, 0);
+		queue_delayed_work(system_power_efficient_wq,&rt5668->jd_check_work, 0);
 	else
 		cancel_delayed_work_sync(&rt5668->jd_check_work);
 

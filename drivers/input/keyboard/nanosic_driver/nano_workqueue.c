@@ -131,7 +131,7 @@ void Nanosic_workQueue_schedule(struct nano_worker_client *worker_client)
 		atomic_inc(
 			&worker_client
 				 ->schedule_delay_count); /*延时10ms后再调度*/
-		delay_work_running = schedule_delayed_work(
+		delay_work_running = queue_delayed_work(system_power_efficient_wq,
 			&worker_client->worker_delay, msecs_to_jiffies(22));
 	}
 }

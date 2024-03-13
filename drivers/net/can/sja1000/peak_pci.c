@@ -316,7 +316,7 @@ static void peak_pciec_led_work(struct work_struct *work)
 
 	/* restart timer (except if no more configured channels) */
 	if (up_count)
-		schedule_delayed_work(&card->led_work, HZ);
+		queue_delayed_work(system_power_efficient_wq,&card->led_work, HZ);
 }
 
 /*
@@ -343,7 +343,7 @@ static void peak_pciec_set_leds(struct peak_pciec_card *card, u8 led_mask, u8 s)
  */
 static void peak_pciec_start_led_work(struct peak_pciec_card *card)
 {
-	schedule_delayed_work(&card->led_work, HZ);
+	queue_delayed_work(system_power_efficient_wq,&card->led_work, HZ);
 }
 
 /*

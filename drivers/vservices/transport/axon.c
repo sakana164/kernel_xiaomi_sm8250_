@@ -979,7 +979,7 @@ static void transport_free_mbuf(struct vs_transport *_transport,
 		if (atomic_inc_return(&service_info->recv_freed) >=
 				service_info->recv_freed_watermark) {
 			transport->free_bufs_pending = true;
-			schedule_delayed_work(&transport->free_bufs_work, 0);
+			queue_delayed_work(system_power_efficient_wq,&transport->free_bufs_work, 0);
 		}
 
 		vs_dev_debug(VS_DEBUG_TRANSPORT, transport->session_dev,
@@ -1258,7 +1258,7 @@ static int transport_send(struct vs_transport *_transport,
 				&service_info->recv_freed) >=
 				service_info->recv_freed_watermark) {
 			transport->free_bufs_pending = true;
-			schedule_delayed_work(&transport->free_bufs_work, 0);
+			queue_delayed_work(system_power_efficient_wq,&transport->free_bufs_work, 0);
 		}
 		transport_put_service_info(service_info);
 		spin_unlock_irqrestore(&transport->readiness_lock, irqflags);
@@ -1345,7 +1345,7 @@ static void transport_free_bufs_work(struct work_struct *work)
 	if (!mbuf) {
 		/* Out of memory at the moment; retry later. */
 		atomic_dec(&transport->free_bufs_balance);
-		schedule_delayed_work(dwork, FREE_BUFS_RETRY_DELAY);
+		queue_delayed_work(system_power_efficient_wq,dwork, FREE_BUFS_RETRY_DELAY);
 		return;
 	}
 
@@ -1435,7 +1435,7 @@ static void transport_free_bufs_work(struct work_struct *work)
 	}
 
 	if (transport->free_bufs_pending)
-		schedule_delayed_work(dwork, 0);
+		queue_delayed_work(system_power_efficient_wq,dwork, 0);
 
 	if (count == 0 && old_balance >= 0) {
 		/*
@@ -1452,7 +1452,7 @@ static void transport_free_bufs_work(struct work_struct *work)
 		 * the ack.
 		 */
 		if (atomic_dec_return(&transport->free_bufs_balance) < 0)
-			schedule_delayed_work(dwork, 0);
+			queue_delayed_work(system_power_efficient_wq,dwork, 0);
 
 		__transport_free_mbuf(transport, mbuf, false);
 
@@ -1614,7 +1614,7 @@ transport_handle_free_bufs_message(struct vs_transport_axon *transport,
 
 	/* Check if we need to send a freed buffers message back */
 	if (new_balance < 0 || transport->free_bufs_pending)
-		schedule_delayed_work(&transport->free_bufs_work, 0);
+		queue_delayed_work(system_power_efficient_wq,&transport->free_bufs_work, 0);
 }
 
 static int transport_rx_queue_buffer(struct vs_transport_axon *transport,

@@ -168,7 +168,7 @@ v3d_job_timedout(struct drm_sched_job *sched_job)
 		job->timedout_ctca = ctca;
 		job->timedout_ctra = ctra;
 
-		schedule_delayed_work(&job->base.work_tdr,
+		queue_delayed_work(system_power_efficient_wq,&job->base.work_tdr,
 				      job->base.sched->timeout);
 		return;
 	}

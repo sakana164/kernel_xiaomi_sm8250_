@@ -275,7 +275,7 @@ static void mlx5_do_bond(struct mlx5_lag *ldev)
 
 static void mlx5_queue_bond_work(struct mlx5_lag *ldev, unsigned long delay)
 {
-	schedule_delayed_work(&ldev->bond_work, delay);
+	queue_delayed_work(system_power_efficient_wq,&ldev->bond_work, delay);
 }
 
 static void mlx5_do_bond_work(struct work_struct *work)

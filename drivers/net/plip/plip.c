@@ -374,7 +374,7 @@ plip_bh(struct work_struct *work)
 	if ((r = (*f)(nl->dev, nl, snd, rcv)) != OK &&
 	    (r = plip_bh_timeout_error(nl->dev, nl, snd, rcv, r)) != OK) {
 		nl->is_deferred = 1;
-		schedule_delayed_work(&nl->deferred, 1);
+		queue_delayed_work(system_power_efficient_wq,&nl->deferred, 1);
 	}
 }
 
@@ -387,7 +387,7 @@ plip_timer_bh(struct work_struct *work)
 	if (!(atomic_read (&nl->kill_timer))) {
 		plip_interrupt (nl->dev);
 
-		schedule_delayed_work(&nl->timer, 1);
+		queue_delayed_work(system_power_efficient_wq,&nl->timer, 1);
 	}
 	else {
 		complete(&nl->killed_timer_cmp);
@@ -608,7 +608,7 @@ plip_receive_packet(struct net_device *dev, struct net_local *nl,
 				rcv->state = PLIP_PK_DONE;
 				nl->is_deferred = 1;
 				nl->connection = PLIP_CN_SEND;
-				schedule_delayed_work(&nl->deferred, 1);
+				queue_delayed_work(system_power_efficient_wq,&nl->deferred, 1);
 				enable_parport_interrupts (dev);
 				ENABLE(dev->irq);
 				return OK;
@@ -860,7 +860,7 @@ plip_send_packet(struct net_device *dev, struct net_local *nl,
 			printk(KERN_DEBUG "%s: send end\n", dev->name);
 		nl->connection = PLIP_CN_CLOSING;
 		nl->is_deferred = 1;
-		schedule_delayed_work(&nl->deferred, 1);
+		queue_delayed_work(system_power_efficient_wq,&nl->deferred, 1);
 		enable_parport_interrupts (dev);
 		ENABLE(dev->irq);
 		return OK;
@@ -904,7 +904,7 @@ plip_error(struct net_device *dev, struct net_local *nl,
 		netif_wake_queue (dev);
 	} else {
 		nl->is_deferred = 1;
-		schedule_delayed_work(&nl->deferred, 1);
+		queue_delayed_work(system_power_efficient_wq,&nl->deferred, 1);
 	}
 
 	return OK;
@@ -1081,7 +1081,7 @@ plip_open(struct net_device *dev)
 	if (dev->irq == -1)
 	{
 		atomic_set (&nl->kill_timer, 0);
-		schedule_delayed_work(&nl->timer, 1);
+		queue_delayed_work(system_power_efficient_wq,&nl->timer, 1);
 	}
 
 	/* Initialize the state machine. */

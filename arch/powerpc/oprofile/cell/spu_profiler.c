@@ -218,7 +218,7 @@ int start_spu_profiling_cycles(unsigned int cycles_reset)
 
 	spu_prof_running = 1;
 	hrtimer_start(&timer, kt, HRTIMER_MODE_REL);
-	schedule_delayed_work(&spu_work, DEFAULT_TIMER_EXPIRE);
+	queue_delayed_work(system_power_efficient_wq,&spu_work, DEFAULT_TIMER_EXPIRE);
 
 	return 0;
 }
@@ -233,7 +233,7 @@ int start_spu_profiling_cycles(unsigned int cycles_reset)
 void start_spu_profiling_events(void)
 {
 	spu_prof_running = 1;
-	schedule_delayed_work(&spu_work, DEFAULT_TIMER_EXPIRE);
+	queue_delayed_work(system_power_efficient_wq,&spu_work, DEFAULT_TIMER_EXPIRE);
 
 	return;
 }

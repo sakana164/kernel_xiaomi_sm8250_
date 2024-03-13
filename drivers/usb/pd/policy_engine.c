@@ -4944,7 +4944,7 @@ static ssize_t usbpd_verifed_store(struct device *dev,
 
 	if (!pd->verifed && !pd->pps_found && !pd->fix_pdo_5v
 			&& (!IS_ENABLED(CONFIG_MACH_XIAOMI_DAGU) || !pd->has_dp))
-		schedule_delayed_work(&pd->fixed_pdo_work, 5 * HZ);
+		queue_delayed_work(system_power_efficient_wq,&pd->fixed_pdo_work, 5 * HZ);
 
 	return size;
 }
@@ -5462,7 +5462,7 @@ int usbpd_select_pdo(struct usbpd *pd, int pdo, int uv, int ua)
 	} else {
 		pd->force_update = false;
 		cancel_delayed_work(&pd->src_check_work);
-		schedule_delayed_work(&pd->src_check_work, 5 * HZ);
+		queue_delayed_work(system_power_efficient_wq,&pd->src_check_work, 5 * HZ);
 	}
 
 	ret = pd_select_pdo_for_bq(pd, pdo, uv, ua);
@@ -5602,7 +5602,7 @@ end:
 	else
 		interval = PPS_MONITOR_LOOP_TIME;
 
-	schedule_delayed_work(&pd->pps_monitor_work, msecs_to_jiffies(interval));
+	queue_delayed_work(system_power_efficient_wq,&pd->pps_monitor_work, msecs_to_jiffies(interval));
 }
 
 static void usbpd_fixed_pdo_workfunc(struct work_struct *w)
@@ -5778,7 +5778,7 @@ static void usbpd_pdo_workfunc(struct work_struct *w)
 
 		if (pd->pps_found) {
 			pd->monitor_entry_time = ktime_get();
-			schedule_delayed_work(&pd->pps_monitor_work, msecs_to_jiffies(PPS_DANGEROUS_LOOP_TIME));
+			queue_delayed_work(system_power_efficient_wq,&pd->pps_monitor_work, msecs_to_jiffies(PPS_DANGEROUS_LOOP_TIME));
 		}
 	}
 

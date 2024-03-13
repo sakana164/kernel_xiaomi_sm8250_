@@ -770,7 +770,7 @@ static size_t __process_echoes(struct tty_struct *tty)
 	if (ldata->echo_commit != tail) {
 		if (!tty->delayed_work) {
 			INIT_DELAYED_WORK(&tty->echo_delayed_work, continue_process_echoes);
-			schedule_delayed_work(&tty->echo_delayed_work, 1);
+			queue_delayed_work(system_power_efficient_wq,&tty->echo_delayed_work, 1);
 		}
 		tty->delayed_work = 1;
 	}

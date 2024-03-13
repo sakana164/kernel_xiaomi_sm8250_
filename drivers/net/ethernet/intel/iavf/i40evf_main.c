@@ -1571,7 +1571,7 @@ static void i40evf_watchdog_task(struct work_struct *work)
 			dev_err(&adapter->pdev->dev, "Hardware came out of reset. Attempting reinit.\n");
 			adapter->state = __I40EVF_STARTUP;
 			adapter->flags &= ~I40EVF_FLAG_PF_COMMS_FAILED;
-			schedule_delayed_work(&adapter->init_task, 10);
+			queue_delayed_work(system_power_efficient_wq,&adapter->init_task, 10);
 			clear_bit(__I40EVF_IN_CRITICAL_TASK,
 				  &adapter->crit_section);
 			/* Don't reschedule the watchdog, since we've restarted
@@ -1730,7 +1730,7 @@ static void i40evf_watchdog_task(struct work_struct *work)
 		goto watchdog_done;
 	}
 
-	schedule_delayed_work(&adapter->client_task, msecs_to_jiffies(5));
+	queue_delayed_work(system_power_efficient_wq,&adapter->client_task, msecs_to_jiffies(5));
 
 	if (adapter->state == __I40EVF_RUNNING)
 		i40evf_request_stats(adapter);
@@ -3577,7 +3577,7 @@ static void i40evf_init_task(struct work_struct *work)
 	}
 	return;
 restart:
-	schedule_delayed_work(&adapter->init_task, msecs_to_jiffies(30));
+	queue_delayed_work(system_power_efficient_wq,&adapter->init_task, msecs_to_jiffies(30));
 	return;
 err_mem:
 	i40evf_free_rss(adapter);
@@ -3595,10 +3595,10 @@ err:
 		adapter->flags |= I40EVF_FLAG_PF_COMMS_FAILED;
 		i40evf_shutdown_adminq(hw);
 		adapter->state = __I40EVF_STARTUP;
-		schedule_delayed_work(&adapter->init_task, HZ * 5);
+		queue_delayed_work(system_power_efficient_wq,&adapter->init_task, HZ * 5);
 		return;
 	}
-	schedule_delayed_work(&adapter->init_task, HZ);
+	queue_delayed_work(system_power_efficient_wq,&adapter->init_task, HZ);
 }
 
 /**
@@ -3726,7 +3726,7 @@ static int i40evf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	INIT_WORK(&adapter->watchdog_task, i40evf_watchdog_task);
 	INIT_DELAYED_WORK(&adapter->client_task, i40evf_client_task);
 	INIT_DELAYED_WORK(&adapter->init_task, i40evf_init_task);
-	schedule_delayed_work(&adapter->init_task,
+	queue_delayed_work(system_power_efficient_wq,&adapter->init_task,
 			      msecs_to_jiffies(5 * (pdev->devfn & 0x07)));
 
 	/* Setup the wait queue for indicating transition to down status */

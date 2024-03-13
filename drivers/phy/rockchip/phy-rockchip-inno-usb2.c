@@ -434,7 +434,7 @@ static int rockchip_usb2phy_init(struct phy *phy)
 			if (ret)
 				goto out;
 
-			schedule_delayed_work(&rport->otg_sm_work,
+			queue_delayed_work(system_power_efficient_wq,&rport->otg_sm_work,
 					      OTG_SCHEDULE_DELAY * 3);
 		} else {
 			/* If OTG works in host only mode, do nothing. */
@@ -452,7 +452,7 @@ static int rockchip_usb2phy_init(struct phy *phy)
 		if (ret)
 			goto out;
 
-		schedule_delayed_work(&rport->sm_work, SCHEDULE_DELAY);
+		queue_delayed_work(system_power_efficient_wq,&rport->sm_work, SCHEDULE_DELAY);
 	}
 
 out:
@@ -573,7 +573,7 @@ static void rockchip_usb2phy_otg_sm_work(struct work_struct *work)
 			dev_dbg(&rport->phy->dev, "vbus_attach\n");
 			switch (rphy->chg_state) {
 			case USB_CHG_STATE_UNDEFINED:
-				schedule_delayed_work(&rport->chg_work, 0);
+				queue_delayed_work(system_power_efficient_wq,&rport->chg_work, 0);
 				return;
 			case USB_CHG_STATE_DETECTED:
 				switch (rphy->chg_type) {
@@ -649,7 +649,7 @@ static void rockchip_usb2phy_otg_sm_work(struct work_struct *work)
 	}
 
 	if (sch_work)
-		schedule_delayed_work(&rport->otg_sm_work, delay);
+		queue_delayed_work(system_power_efficient_wq,&rport->otg_sm_work, delay);
 }
 
 static const char *chg_to_string(enum power_supply_type chg_type)
@@ -786,7 +786,7 @@ static void rockchip_chg_detect_work(struct work_struct *work)
 		return;
 	}
 
-	schedule_delayed_work(&rport->chg_work, delay);
+	queue_delayed_work(system_power_efficient_wq,&rport->chg_work, delay);
 }
 
 /*
@@ -889,7 +889,7 @@ static void rockchip_usb2phy_sm_work(struct work_struct *work)
 
 next_schedule:
 	mutex_unlock(&rport->mutex);
-	schedule_delayed_work(&rport->sm_work, SCHEDULE_DELAY);
+	queue_delayed_work(system_power_efficient_wq,&rport->sm_work, SCHEDULE_DELAY);
 }
 
 static irqreturn_t rockchip_usb2phy_linestate_irq(int irq, void *data)
@@ -987,7 +987,7 @@ static int rockchip_otg_event(struct notifier_block *nb,
 	struct rockchip_usb2phy_port *rport =
 		container_of(nb, struct rockchip_usb2phy_port, event_nb);
 
-	schedule_delayed_work(&rport->otg_sm_work, OTG_SCHEDULE_DELAY);
+	queue_delayed_work(system_power_efficient_wq,&rport->otg_sm_work, OTG_SCHEDULE_DELAY);
 
 	return NOTIFY_DONE;
 }

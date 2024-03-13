@@ -382,7 +382,7 @@ static void device_run(void *priv)
 	device_process(ctx, src_buf, dst_buf);
 
 	/* Run delayed work, which simulates a hardware irq  */
-	schedule_delayed_work(&dev->work_run, msecs_to_jiffies(ctx->transtime));
+	queue_delayed_work(system_power_efficient_wq,&dev->work_run, msecs_to_jiffies(ctx->transtime));
 }
 
 static void device_work(struct work_struct *w)

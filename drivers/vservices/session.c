@@ -970,7 +970,7 @@ static void service_cooloff_work(struct work_struct *work)
 		 * until cooloff. Schedule the ready work to run immediately.
 		 */
 		if (service->readiness == VS_SERVICE_RESET)
-			schedule_delayed_work(&service->ready_work, 0);
+			queue_delayed_work(system_power_efficient_wq,&service->ready_work, 0);
 	} else {
 		/*
 		 * This can happen if last_reset_request has been bumped
@@ -983,7 +983,7 @@ static void service_cooloff_work(struct work_struct *work)
 
 		WARN_ON(time_after(current_time, wake_time));
 
-		schedule_delayed_work(&service->cooloff_work,
+		queue_delayed_work(system_power_efficient_wq,&service->cooloff_work,
 				wake_time - current_time);
 	}
 
@@ -2172,7 +2172,7 @@ static void queue_ready_work(struct vs_service_device *service)
 		 * Schedule cooloff work, to set the reset_delay to 0 if
 		 * the reset requests stop for long enough.
 		 */
-		schedule_delayed_work(&service->cooloff_work,
+		queue_delayed_work(system_power_efficient_wq,&service->cooloff_work,
 				reset_cool_off(service));
 	}
 
@@ -2209,7 +2209,7 @@ static void queue_ready_work(struct vs_service_device *service)
 		dev_err(&session->dev, "Service %s hit max reset throttle\n",
 				dev_name(&service->dev));
 
-	schedule_delayed_work(&service->ready_work, delay);
+	queue_delayed_work(system_power_efficient_wq,&service->ready_work, delay);
 }
 
 static void session_activation_work(struct work_struct *work)

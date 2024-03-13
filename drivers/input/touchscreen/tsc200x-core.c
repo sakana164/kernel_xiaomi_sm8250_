@@ -254,7 +254,7 @@ static void __tsc200x_enable(struct tsc200x *ts)
 
 	if (ts->esd_timeout && ts->reset_gpio) {
 		ts->last_valid_interrupt = jiffies;
-		schedule_delayed_work(&ts->esd_work,
+		queue_delayed_work(system_power_efficient_wq,&ts->esd_work,
 				round_jiffies_relative(
 					msecs_to_jiffies(ts->esd_timeout)));
 	}
@@ -410,7 +410,7 @@ out:
 	mutex_unlock(&ts->mutex);
 reschedule:
 	/* re-arm the watchdog */
-	schedule_delayed_work(&ts->esd_work,
+	queue_delayed_work(system_power_efficient_wq,&ts->esd_work,
 			      round_jiffies_relative(
 					msecs_to_jiffies(ts->esd_timeout)));
 }

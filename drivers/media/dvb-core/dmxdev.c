@@ -2137,7 +2137,7 @@ static void dvb_dmxdev_ts_insertion_work(struct work_struct *worker)
 				ts_buffer->buffer, ts_buffer->size);
 
 	if (ts_buffer->repetition_time && !ts_buffer->abort)
-		schedule_delayed_work(&ts_buffer->dwork,
+		queue_delayed_work(system_power_efficient_wq,&ts_buffer->dwork,
 				msecs_to_jiffies(ts_buffer->repetition_time));
 }
 
@@ -2158,7 +2158,7 @@ static void dvb_dmxdev_queue_ts_insertion(
 	}
 
 	ts_buffer->abort = 0;
-	schedule_delayed_work(&ts_buffer->dwork, 0);
+	queue_delayed_work(system_power_efficient_wq,&ts_buffer->dwork, 0);
 }
 
 static void dvb_dmxdev_cancel_ts_insertion(

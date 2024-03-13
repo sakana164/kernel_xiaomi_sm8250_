@@ -698,7 +698,7 @@ static void intel_hdcp_check_work(struct work_struct *work)
 							 struct intel_connector,
 							 hdcp_check_work);
 	if (!intel_hdcp_check_link(connector))
-		schedule_delayed_work(&connector->hdcp_check_work,
+		queue_delayed_work(system_power_efficient_wq,&connector->hdcp_check_work,
 				      DRM_HDCP_CHECK_PERIOD_MS);
 }
 
@@ -766,7 +766,7 @@ int intel_hdcp_enable(struct intel_connector *connector)
 
 	connector->hdcp_value = DRM_MODE_CONTENT_PROTECTION_ENABLED;
 	schedule_work(&connector->hdcp_prop_work);
-	schedule_delayed_work(&connector->hdcp_check_work,
+	queue_delayed_work(system_power_efficient_wq,&connector->hdcp_check_work,
 			      DRM_HDCP_CHECK_PERIOD_MS);
 out:
 	mutex_unlock(&connector->hdcp_mutex);

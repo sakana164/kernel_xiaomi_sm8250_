@@ -4576,7 +4576,7 @@ int aw869x_ram_init(struct aw869x *aw869x)
 
 	aw_info("%s enter\n", __func__);
 	INIT_DELAYED_WORK(&aw869x->ram_work, aw869x_ram_work_routine);
-	/*schedule_delayed_work(&aw869x->ram_work,
+	/*queue_delayed_work(system_power_efficient_wq,&aw869x->ram_work,
 	 *			msecs_to_jiffies(ram_timer_val));
 	 */
 	queue_delayed_work(aw869x->work_queue, &aw869x->ram_work,

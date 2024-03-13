@@ -134,7 +134,7 @@ static void mrpc_cmd_submit(struct switchtec_dev *stdev)
 		    stuser->data, stuser->data_len);
 	iowrite32(stuser->cmd, &stdev->mmio_mrpc->cmd);
 
-	schedule_delayed_work(&stdev->mrpc_timeout,
+	queue_delayed_work(system_power_efficient_wq,&stdev->mrpc_timeout,
 			      msecs_to_jiffies(500));
 }
 
@@ -219,7 +219,7 @@ static void mrpc_timeout_work(struct work_struct *work)
 
 	status = ioread32(&stdev->mmio_mrpc->status);
 	if (status == SWITCHTEC_MRPC_STATUS_INPROGRESS) {
-		schedule_delayed_work(&stdev->mrpc_timeout,
+		queue_delayed_work(system_power_efficient_wq,&stdev->mrpc_timeout,
 				      msecs_to_jiffies(500));
 		goto out;
 	}

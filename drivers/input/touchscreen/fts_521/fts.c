@@ -3151,7 +3151,7 @@ static int fts_power_supply_event(struct notifier_block *nb,
 
 	if (!info)
 		return 0;
-	schedule_delayed_work(&info->power_supply_work, msecs_to_jiffies(500));
+	queue_delayed_work(system_power_efficient_wq,&info->power_supply_work, msecs_to_jiffies(500));
 	return 0;
 }
 #endif

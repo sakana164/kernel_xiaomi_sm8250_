@@ -196,7 +196,7 @@ static void health_care(struct work_struct *work)
 
 	spin_lock_irqsave(&health->wq_lock, flags);
 	if (!test_bit(MLX5_DROP_NEW_RECOVERY_WORK, &health->flags))
-		schedule_delayed_work(&health->recover_work, recover_delay);
+		queue_delayed_work(system_power_efficient_wq,&health->recover_work, recover_delay);
 	else
 		dev_err(&dev->pdev->dev,
 			"new health works are not permitted at this stage\n");

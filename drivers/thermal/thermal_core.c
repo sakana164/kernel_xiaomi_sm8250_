@@ -338,11 +338,12 @@ static void thermal_zone_device_set_polling(struct workqueue_struct *queue,
 					    int delay)
 {
 	if (delay > 1000)
-		mod_delayed_work(queue, &tz->poll_queue,
+		mod_delayed_work(system_freezable_power_efficient_wq,
+				 &tz->poll_queue,
 				 round_jiffies(msecs_to_jiffies(delay)));
 	else if (delay)
-		mod_delayed_work(queue, &tz->poll_queue,
-				 msecs_to_jiffies(delay));
+		mod_delayed_work(system_freezable_power_efficient_wq,
+				 &tz->poll_queue, msecs_to_jiffies(delay));
 	else
 		cancel_delayed_work(&tz->poll_queue);
 }
@@ -416,7 +417,7 @@ static void thermal_emergency_poweroff(void)
 	 */
 	if (poweroff_delay_ms <= 0)
 		return;
-	schedule_delayed_work(&thermal_emergency_poweroff_work,
+	queue_delayed_work(system_power_efficient_wq,&thermal_emergency_poweroff_work,
 			      msecs_to_jiffies(poweroff_delay_ms));
 }
 

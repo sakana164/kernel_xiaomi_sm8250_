@@ -1041,7 +1041,7 @@ int iwl_fw_dbg_collect_desc(struct iwl_fw_runtime *fwrt,
 	fwrt->dump.desc = desc;
 	fwrt->dump.trig = trigger;
 
-	schedule_delayed_work(&fwrt->dump.wk, delay);
+	queue_delayed_work(system_power_efficient_wq,&fwrt->dump.wk, delay);
 
 	return 0;
 }

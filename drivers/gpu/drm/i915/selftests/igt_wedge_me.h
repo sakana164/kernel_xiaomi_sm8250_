@@ -40,7 +40,7 @@ static void __igt_init_wedge(struct igt_wedge_me *w,
 	w->name = name;
 
 	INIT_DELAYED_WORK_ONSTACK(&w->work, __igt_wedge_me);
-	schedule_delayed_work(&w->work, timeout);
+	queue_delayed_work(system_power_efficient_wq,&w->work, timeout);
 }
 
 static void __igt_fini_wedge(struct igt_wedge_me *w)

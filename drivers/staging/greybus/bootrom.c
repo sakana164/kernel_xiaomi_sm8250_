@@ -89,7 +89,7 @@ static void gb_bootrom_set_timeout(struct gb_bootrom *bootrom,
 			enum next_request_type next, unsigned long timeout)
 {
 	bootrom->next_request = next;
-	schedule_delayed_work(&bootrom->dwork, msecs_to_jiffies(timeout));
+	queue_delayed_work(system_power_efficient_wq,&bootrom->dwork, msecs_to_jiffies(timeout));
 }
 
 static void gb_bootrom_cancel_timeout(struct gb_bootrom *bootrom)

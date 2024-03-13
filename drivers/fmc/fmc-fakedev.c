@@ -185,7 +185,7 @@ static int ff_eeprom_write(struct fmc_device *fmc, uint32_t offset,
 	dev_info(&fmc->dev, "write_eeprom: offset %i, size %zi\n",
 		 (int)offset, size);
 	memcpy(fmc->eeprom + offset, buf, size);
-	schedule_delayed_work(&ff_work, HZ * 2); /* remove, replug, in 2s */
+	queue_delayed_work(system_power_efficient_wq,&ff_work, HZ * 2); /* remove, replug, in 2s */
 	return size;
 }
 

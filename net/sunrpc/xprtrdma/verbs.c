@@ -1004,7 +1004,7 @@ rpcrdma_mr_defer_recovery(struct rpcrdma_mr *mr)
 	rpcrdma_mr_push(mr, &buf->rb_stale_mrs);
 	spin_unlock(&buf->rb_recovery_lock);
 
-	schedule_delayed_work(&buf->rb_recovery_worker, 0);
+	queue_delayed_work(system_power_efficient_wq,&buf->rb_recovery_worker, 0);
 }
 
 static void
@@ -1286,7 +1286,7 @@ rpcrdma_mr_get(struct rpcrdma_xprt *r_xprt)
 out_nomrs:
 	trace_xprtrdma_nomrs(r_xprt);
 	if (r_xprt->rx_ep.rep_connected != -ENODEV)
-		schedule_delayed_work(&buf->rb_refresh_worker, 0);
+		queue_delayed_work(system_power_efficient_wq,&buf->rb_refresh_worker, 0);
 
 	/* Allow the reply handler and refresh worker to run */
 	cond_resched();

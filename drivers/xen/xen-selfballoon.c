@@ -237,7 +237,7 @@ static void selfballoon_process(struct work_struct *work)
 	}
 #endif
 	if (reset_timer)
-		schedule_delayed_work(&selfballoon_worker,
+		queue_delayed_work(system_power_efficient_wq,&selfballoon_worker,
 			selfballoon_interval * HZ);
 }
 
@@ -275,7 +275,7 @@ static ssize_t store_selfballooning(struct device *dev,
 
 	xen_selfballooning_enabled = !!tmp;
 	if (!was_enabled && xen_selfballooning_enabled)
-		schedule_delayed_work(&selfballoon_worker,
+		queue_delayed_work(system_power_efficient_wq,&selfballoon_worker,
 			selfballoon_interval * HZ);
 
 	return count;
@@ -432,7 +432,7 @@ static ssize_t store_frontswap_selfshrinking(struct device *dev,
 	frontswap_selfshrinking = !!tmp;
 	if (!was_enabled && !xen_selfballooning_enabled &&
 	     frontswap_selfshrinking)
-		schedule_delayed_work(&selfballoon_worker,
+		queue_delayed_work(system_power_efficient_wq,&selfballoon_worker,
 			selfballoon_interval * HZ);
 
 	return count;
@@ -572,7 +572,7 @@ int xen_selfballoon_init(bool use_selfballooning, bool use_frontswap_selfshrink)
 		reserve_pages = totalram_pages / 10;
 		selfballoon_reserved_mb = PAGES2MB(reserve_pages);
 	}
-	schedule_delayed_work(&selfballoon_worker, selfballoon_interval * HZ);
+	queue_delayed_work(system_power_efficient_wq,&selfballoon_worker, selfballoon_interval * HZ);
 
 	return 0;
 }

@@ -228,7 +228,7 @@ xprt_rdma_free_addresses(struct rpc_xprt *xprt)
 void
 rpcrdma_conn_func(struct rpcrdma_ep *ep)
 {
-	schedule_delayed_work(&ep->rep_connect_worker, 0);
+	queue_delayed_work(system_power_efficient_wq,&ep->rep_connect_worker, 0);
 }
 
 void
@@ -536,7 +536,7 @@ xprt_rdma_connect(struct rpc_xprt *xprt, struct rpc_task *task)
 
 	if (r_xprt->rx_ep.rep_connected != 0) {
 		/* Reconnect */
-		schedule_delayed_work(&r_xprt->rx_connect_worker,
+		queue_delayed_work(system_power_efficient_wq,&r_xprt->rx_connect_worker,
 				      xprt->reestablish_timeout);
 		xprt->reestablish_timeout <<= 1;
 		if (xprt->reestablish_timeout > RPCRDMA_MAX_REEST_TO)
@@ -544,7 +544,7 @@ xprt_rdma_connect(struct rpc_xprt *xprt, struct rpc_task *task)
 		else if (xprt->reestablish_timeout < RPCRDMA_INIT_REEST_TO)
 			xprt->reestablish_timeout = RPCRDMA_INIT_REEST_TO;
 	} else {
-		schedule_delayed_work(&r_xprt->rx_connect_worker, 0);
+		queue_delayed_work(system_power_efficient_wq,&r_xprt->rx_connect_worker, 0);
 		if (!RPC_IS_ASYNC(task))
 			flush_delayed_work(&r_xprt->rx_connect_worker);
 	}

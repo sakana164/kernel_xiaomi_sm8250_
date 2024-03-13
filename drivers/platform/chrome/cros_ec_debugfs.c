@@ -134,7 +134,7 @@ static void cros_ec_console_log_work(struct work_struct *__work)
 	mutex_unlock(&debug_info->log_mutex);
 
 resched:
-	schedule_delayed_work(&debug_info->log_poll_work,
+	queue_delayed_work(system_power_efficient_wq,&debug_info->log_poll_work,
 			      msecs_to_jiffies(LOG_POLL_SEC * 1000));
 }
 
@@ -355,7 +355,7 @@ static int cros_ec_create_console_log(struct cros_ec_debugfs *debug_info)
 
 	INIT_DELAYED_WORK(&debug_info->log_poll_work,
 			  cros_ec_console_log_work);
-	schedule_delayed_work(&debug_info->log_poll_work, 0);
+	queue_delayed_work(system_power_efficient_wq,&debug_info->log_poll_work, 0);
 
 	return 0;
 }
@@ -487,6 +487,6 @@ EXPORT_SYMBOL(cros_ec_debugfs_suspend);
 void cros_ec_debugfs_resume(struct cros_ec_dev *ec)
 {
 	if (ec->debug_info && ec->debug_info->log_buffer.buf)
-		schedule_delayed_work(&ec->debug_info->log_poll_work, 0);
+		queue_delayed_work(system_power_efficient_wq,&ec->debug_info->log_poll_work, 0);
 }
 EXPORT_SYMBOL(cros_ec_debugfs_resume);

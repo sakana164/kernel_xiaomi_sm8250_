@@ -3601,7 +3601,7 @@ static void schedule_delayed(struct ceph_mds_client *mdsc)
 {
 	int delay = 5;
 	unsigned hz = round_jiffies_relative(HZ * delay);
-	schedule_delayed_work(&mdsc->delayed_work, hz);
+	queue_delayed_work(system_power_efficient_wq,&mdsc->delayed_work, hz);
 }
 
 static void delayed_work(struct work_struct *work)
