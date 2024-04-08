@@ -316,10 +316,9 @@ static int dsi_panel_parse_smart_fps_config(struct dsi_panel *panel,
 	struct dsi_parser_utils *utils = &panel->utils;
 	struct dsi_panel_mi_cfg *mi_cfg = &panel->mi_cfg;
 
-	mi_cfg->idle_mode_flag = true;
+	mi_cfg->idle_mode_flag = false;
 
-	mi_cfg->smart_fps_support = utils->read_bool(of_node,
-			"mi,mdss-dsi-pan-enable-smart-fps");
+	mi_cfg->smart_fps_support = false;
 
 	if (mi_cfg->smart_fps_support) {
 		pr_info("smart fps is supported\n");
