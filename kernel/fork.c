@@ -2443,8 +2443,8 @@ long _do_fork(unsigned long clone_flags,
 	}
 
 #ifdef CONFIG_PERF_HUMANTASK
-        p->human_task = 0;
-        p->inherit_task = 0;
+    p->human_task = 0;
+    // p->inherit_task = 0;
 #endif
 
 	wake_up_new_task(p);
