@@ -1,12 +1,35 @@
-BRANCH=android-4.19-stable
+ARCH=arm64
 KMI_GENERATION=0
 
 LLVM=1
+LLVM_IAS=1
+CC=clang
+LD=ld.lld
+CLANG_TRIPLE=aarch64-linux-gnu-
+CROSS_COMPILE=aarch64-linux-gnu-
+CROSS_COMPILE_COMPAT=arm-linux-gnueabi-
+
 DEPMOD=depmod
-CLANG_PREBUILT_BIN=prebuilts-master/clang/host/linux-x86/clang-r416183b/bin
+CLANG_PREBUILT_BIN=prebuilts-master/clang/host/linux-x86/clang-r530567/bin
 BUILDTOOLS_PREBUILT_BIN=build/build-tools/path/linux-x86
 
 EXTRA_CMDS=''
+LD_LIBRARY_PATH=${ROOT_DIR}/prebuilts-master/clang/host/linux-x86/clang-r530567/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH
+LINUX_GCC_CROSS_COMPILE_PREBUILTS_BIN=prebuilts/gas/linux-x86
+LIBUFDT_PREBUILTS_BIN=prebuilts-master/misc/linux-x86/libufdt
+DTC_EXT=${ROOT_DIR}/prebuilts/kernel-build-tools/linux-x86/bin/dtc
+export DTC_EXT
+DTC_OVERLAY_TEST_EXT=${ROOT_DIR}/prebuilts/kernel-build-tools/linux-x86/bin/ufdt_apply_overlay
+export DTC_OVERLAY_TEST_EXT
+FILES="
+arch/arm64/boot/dts/vendor/qcom/*.dtb
+arch/arm64/boot/dtbo.img
+arch/arm64/boot/Image
+vmlinux
+System.map
+.config
+"
 STOP_SHIP_TRACEPRINTK=1
-IN_KERNEL_MODULES=1
-DO_NOT_STRIP_MODULES=1
+
+KLEAF_SUPPRESS_BUILD_SH_DEPRECATION_WARNING=1
