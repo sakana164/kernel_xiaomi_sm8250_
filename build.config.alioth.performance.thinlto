@@ -72,7 +72,6 @@ function update_perf_config() {
     -d NL80211_TESTMODE \
     -e THINLTO \
     -e LTO_CLANG \
-    -d CONFIG_CFI_CLANG \
     -d CFI_PERMISSIVE \
     -d CFI_CLANG \
     -e COMPAT_VDSO \
